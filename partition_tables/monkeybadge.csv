@@ -1,0 +1,18 @@
+# Partition table for MicroPython with OTA support using 8MB flash
+# with a custom partition setup
+# Notes: the offset of the partition table itself is set in
+# $IDF_PATH/components/partition_table/Kconfig.projbuild.
+# Name,   Type, SubType,  Offset,   Size,  Flags
+
+nvs, data, nvs, 0x9000, 0x24000
+otadata, data, ota, 0x2D000, 0x2000
+phy_init, data, phy, 0x2F000, 0x1000
+
+ota_0, app, ota_0, 0x30000, 0x200000
+ota_1, app, ota_1, 0x230000, 0x200000
+
+nvs_key, data, nvs_keys, 0x430000, 0x4000
+appconfig, data, nvs, 0x434000, 0x80000
+locfd, data, fat, 0x4B4000, 0x339000
+
+#vim: ts=2 sw=2 sts=2 et
