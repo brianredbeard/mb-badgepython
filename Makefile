@@ -19,9 +19,9 @@ prepare-mch2022: prepare
 	cp configs/mch2022_defconfig sdkconfig
 	cp partition_tables/mch2022.csv partitions.csv
 	
-prepare-monkey: prepare
-	cp configs/monkey_defconfig sdkconfig
-	cp partition_tables/monkey.csv partitions.csv
+prepare-monkeybadge: prepare
+	cp configs/monkeybadge_defconfig sdkconfig
+	cp partition_tables/monkeybadge.csv partitions.csv
 	
 prepare-campzone2019: prepare
 	cp configs/campzone2019_defconfig sdkconfig
