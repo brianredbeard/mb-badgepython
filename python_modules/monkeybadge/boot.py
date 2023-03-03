@@ -1,10 +1,8 @@
-import machine, sys, system, time, touchpads
+import machine, sys, system, time
 import rtcmem
 
 rtcmem.write(0,0)
 rtcmem.write(1,0)
-
-touchpads.on(touchpads.HOME, system.home)
 
 with open('cache/bootreason.txt', 'wa') as file:
 	file.write(str(machine.wake_reason()))
