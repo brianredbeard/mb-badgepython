@@ -1,5 +1,6 @@
 freeze("$(MPY_DIR)/tools", ("upip.py", "upip_utarfile.py"))
 freeze("$(MPY_DIR)/drivers/dht", "dht.py")
+freeze("$(MPY_DIR)/drivers/neopixel")
 freeze("$(MPY_DIR)/drivers/display", "ssd1306.py")
 include("$(MPY_DIR)/extmod/uasyncio/manifest.py")
 include("$(MPY_DIR)/extmod/webrepl/manifest.py")
