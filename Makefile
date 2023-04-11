@@ -19,7 +19,10 @@ prepare-mch2022: prepare
 	cp configs/mch2022_defconfig sdkconfig
 	cp partition_tables/mch2022.csv partitions.csv
 	
-prepare-monkeybadge: prepare
+prepare-monkeybadge:
+	# git submodule update --init --recursive
+	#cd esp-idf; bash install.sh; cd ..
+	#cd components/micropython/micropython/mpy-cross; make
 	cp configs/monkeybadge_defconfig sdkconfig
 	cp partition_tables/monkeybadge.csv partitions.csv
 	
