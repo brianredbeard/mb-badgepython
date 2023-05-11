@@ -6,28 +6,10 @@ set(MICROPY_FROZEN_MANIFEST ${PROJECT_DIR}/manifests/${CONFIG_MICROPY_FROZEN_MAN
 include(${MICROPY_DIR}/py/py.cmake)
 
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
+    set(MICROPY_PY_BTREE ON)
+
     include(${MICROPY_DIR}/py/usermod.cmake)
     include(${MICROPY_DIR}/extmod/extmod.cmake)
-
-    list(REMOVE_ITEM MICROPY_SOURCE_EXTMOD
-        ${MICROPY_EXTMOD_DIR}/vfs.c
-        ${MICROPY_EXTMOD_DIR}/vfs_blockdev.c
-        ${MICROPY_EXTMOD_DIR}/vfs_fat.c
-        ${MICROPY_EXTMOD_DIR}/vfs_fat_diskio.c
-        ${MICROPY_EXTMOD_DIR}/vfs_fat_file.c
-        ${MICROPY_EXTMOD_DIR}/vfs_lfs.c
-        ${MICROPY_EXTMOD_DIR}/vfs_posix.c
-        ${MICROPY_EXTMOD_DIR}/vfs_posix_file.c
-        ${MICROPY_EXTMOD_DIR}/vfs_reader.c    
-    )
-
-    list(APPEND MICROPY_SOURCE_EXTMOD
-        ${COMPONENT_DIR}/vfs_fat/vfs_native_file.c
-        ${COMPONENT_DIR}/vfs_fat/vfs_native_misc.c
-        ${COMPONENT_DIR}/vfs_fat/vfs_native.c
-        ${COMPONENT_DIR}/vfs_fat/vfs_reader.c
-        ${COMPONENT_DIR}/vfs_fat/vfs.c
-    )
 endif()
 
 set(MICROPY_QSTRDEFS_PORT
@@ -50,8 +32,8 @@ set(MICROPY_SOURCE_LIB
     ${MICROPY_DIR}/lib/littlefs/lfs2.c
     ${MICROPY_DIR}/lib/littlefs/lfs2_util.c
     ${MICROPY_DIR}/lib/mbedtls_errors/mp_mbedtls_errors.c
-    # ${MICROPY_DIR}/lib/oofatfs/ff.c
-    # ${MICROPY_DIR}/lib/oofatfs/ffunicode.c
+    ${MICROPY_DIR}/lib/oofatfs/ff.c
+    ${MICROPY_DIR}/lib/oofatfs/ffunicode.c
 )
 if(IDF_TARGET STREQUAL "esp32c3")
     list(APPEND MICROPY_SOURCE_LIB ${MICROPY_DIR}/shared/runtime/gchelper_generic.c)
@@ -65,24 +47,24 @@ set(MICROPY_SOURCE_DRIVERS
 set(MICROPY_SOURCE_PORT
     ${COMPONENT_DIR}/main.c
     ${COMPONENT_DIR}/modconsts.c
+
     ${MICROPY_PORT_DIR}/main.c
     ${MICROPY_PORT_DIR}/uart.c
     ${MICROPY_PORT_DIR}/usb.c
     ${MICROPY_PORT_DIR}/usb_serial_jtag.c
     ${MICROPY_PORT_DIR}/gccollect.c
     ${MICROPY_PORT_DIR}/mphalport.c
-    #${MICROPY_PORT_DIR}/fatfs_port.c
+    ${MICROPY_PORT_DIR}/fatfs_port.c
     ${MICROPY_PORT_DIR}/help.c
     ${MICROPY_PORT_DIR}/modutime.c
-    #${MICROPY_PORT_DIR}/moduos.c
-    ${COMPONENT_DIR}/vfs_fat/moduos.c
     ${MICROPY_PORT_DIR}/machine_bitstream.c
     ${MICROPY_PORT_DIR}/machine_timer.c
     ${MICROPY_PORT_DIR}/machine_pin.c
     ${MICROPY_PORT_DIR}/machine_touchpad.c
     ${MICROPY_PORT_DIR}/machine_adc.c
+    ${MICROPY_PORT_DIR}/machine_adcblock.c
     ${MICROPY_PORT_DIR}/machine_dac.c
-    ${COMPONENT_DIR}/esp32/machine_i2c.c
+    ${MICROPY_PORT_DIR}/machine_i2c.c
     ${MICROPY_PORT_DIR}/machine_i2s.c
     ${MICROPY_PORT_DIR}/machine_uart.c
     ${MICROPY_PORT_DIR}/modmachine.c
@@ -98,11 +80,11 @@ set(MICROPY_SOURCE_PORT
     ${MICROPY_PORT_DIR}/esp32_rmt.c
     ${MICROPY_PORT_DIR}/esp32_ulp.c
     ${MICROPY_PORT_DIR}/modesp32.c
-    ${COMPONENT_DIR}/esp32/machine_hw_spi.c
+    ${MICROPY_PORT_DIR}/machine_hw_spi.c
     ${MICROPY_PORT_DIR}/machine_wdt.c
     ${MICROPY_PORT_DIR}/mpthreadport.c
     ${MICROPY_PORT_DIR}/machine_rtc.c
-    #${MICROPY_PORT_DIR}/machine_sdcard.c
+    ${MICROPY_PORT_DIR}/machine_sdcard.c
 )
 
 set(MICROPY_SOURCE_QSTR
@@ -113,9 +95,7 @@ set(MICROPY_SOURCE_QSTR
     ${MICROPY_SOURCE_LIB}
     ${MICROPY_SOURCE_PORT}
     ${MICROPY_SOURCE_BOARD}
-    ${COMPONENT_DIR}/modconsts.c
-    ${EXTMODS}
-    ${COMPONENT_DIR}/mpconfigoverrides.h
+    #${COMPONENT_DIR}/modconsts.c
 )
 
 set(IDF_COMPONENTS
@@ -123,6 +103,7 @@ set(IDF_COMPONENTS
     bootloader_support
     bt
     driver
+    esp_adc_cal
     esp_common
     esp_eth
     esp_event
@@ -144,12 +125,6 @@ set(IDF_COMPONENTS
     ulp
     vfs
     xtensa
-    fatfs
-    wear_levelling
-    spiffs
-    driver_sdcard
-    buses
-    wpa_supplicant
 )
 
 if(IDF_VERSION_MINOR GREATER_EQUAL 1 OR IDF_VERSION_MAJOR GREATER_EQUAL 5)
@@ -197,21 +172,20 @@ idf_component_register(
         ${MICROPY_BOARD_DIR}
         ${CMAKE_BINARY_DIR}
         "./"
-        "vfs_fat/"
     REQUIRES
         ${IDF_COMPONENTS}
 )
 
-add_custom_command(
-    OUTPUT
-        ${COMPONENT_DIR}/mpconfigoverrides.h
-    COMMAND echo extmods: ${EXTMODS} &&
-            python3 mpconfigover_generator.py -b ./ \"${EXTMODS_NAMES}\" &&
-            cp mpconfigport.h micropython/ports/esp32/ &&
-            cp help.c micropython/ports/esp32/
-    WORKING_DIRECTORY ${COMPONENT_DIR}
-    DEPENDS ${EXTMODS}
-)
+#add_custom_command(
+#    OUTPUT
+#        ${COMPONENT_DIR}/mpconfigoverrides.h
+#    COMMAND echo extmods: ${EXTMODS} &&
+#            python3 mpconfigover_generator.py -b ./ \"${EXTMODS_NAMES}\" &&
+#            cp mpconfigport.h micropython/ports/esp32/ &&
+#            cp help.c micropython/ports/esp32/
+#    WORKING_DIRECTORY ${COMPONENT_DIR}
+#    DEPENDS ${EXTMODS}
+#)
 
 # Set the MicroPython target as the current (main) IDF component target.
 set(MICROPY_TARGET ${COMPONENT_TARGET})
@@ -223,6 +197,12 @@ set(MICROPY_CROSS_FLAGS -march=xtensawin)
 target_compile_definitions(${MICROPY_TARGET} PUBLIC
     ${MICROPY_DEF_CORE}
     MICROPY_ESP_IDF_4=1
+    MICROPY_VFS_FAT=1
+    MICROPY_VFS_LFS2=1
+    FFCONF_H=\"${MICROPY_OOFATFS_DIR}/ffconf.h\"
+    LFS1_NO_MALLOC LFS1_NO_DEBUG LFS1_NO_WARN LFS1_NO_ERROR LFS1_NO_ASSERT
+    LFS2_NO_MALLOC LFS2_NO_DEBUG LFS2_NO_WARN LFS2_NO_ERROR LFS2_NO_ASSERT
+
 )
 
 # Disable some warnings to keep the build output clean.

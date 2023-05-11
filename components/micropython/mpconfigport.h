@@ -11,7 +11,8 @@
 #include "driver/i2s.h"
 
 // !!--- CHANGES HERE FOR OUR FIRMARE ---!!
-#include "mpconfigoverrides.h"
+//#include "mpconfigoverrides.h"
+
 
 // object representation and NLR handling
 #define MICROPY_OBJ_REPR                    (MICROPY_OBJ_REPR_A)
