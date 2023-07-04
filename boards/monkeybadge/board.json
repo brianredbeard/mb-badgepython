@@ -7,16 +7,16 @@
         "BLE",
         "WiFi"
     ],
-    "id": "esp32",
+    "id": "monkeybadge",
     "images": [
         "esp32_devkitc.jpg"
     ],
     "mcu": "esp32",
-    "product": "ESP32",
+    "product": "MonkeyBadge",
     "thumbnail": "",
-    "url": "https://www.espressif.com/en/products/modules",
+    "url": "https://github.com/packetchat/monkeybadge",
     "variants": {
-        "idf3": "Compiled with IDF 3.x"
+        "idf4": "Compiled with IDF 4.x"
     },
-    "vendor": "Espressif"
+    "vendor": "PacketChat"
 }
